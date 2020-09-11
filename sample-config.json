@@ -1,0 +1,12 @@
+{
+    "accessories": [
+        {
+            "accessory": "Watchdog15",
+            "name": "Basement",
+            "ip": "192.168.1.45",
+            "warningHiTemp": 115,
+            "warningLoTemp": 34,
+            "warningHiHumidity": 70
+        }
+    ]
+}
