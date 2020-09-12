@@ -1,4 +1,5 @@
 
+const debug = require('debug')('watchdog15')
 const snmp = require("snmp-native")
 const nodeCache = require( "node-cache" )
 const moment = require('moment')
@@ -40,7 +41,7 @@ module.exports = homebridge => {
 
     function Watchdog15 (_log, _config) 
     {
-        _log.debug("Init Watchdog15 Accessory")
+        debug("Init Watchdog15 Accessory")
 
         this.log = _log;
         this.config = _config;
@@ -64,7 +65,7 @@ module.exports = homebridge => {
         // TTL refresh defaults to 60 seconds unless otherwise noted
         this.cacheTTL = _config.updateInterval || 60;
 
-        this.log.debug("Config:", JSON.stringify(_config));
+        debug("Config:", JSON.stringify(_config));
 
         // Initialize the SNMP Connection 
         this.log('WD15 configured on', this.ip)
@@ -101,7 +102,7 @@ module.exports = homebridge => {
         // get the temperature of the internal sensor
         getTemperature: function (callback) 
         {
-            this.log.debug("Get Temperature Requested");
+            debug("Get Temperature Requested");
             
             this.fetchData((err, data) => {
                 if (err) {
@@ -115,7 +116,7 @@ module.exports = homebridge => {
 
         getTemperatureStatus: function (callback) 
         {
-            this.log.debug("Get Temperature Status Requested");
+            debug("Get Temperature Status Requested");
             
             this.fetchData((err, data) => {
                 if (err) {
@@ -129,7 +130,7 @@ module.exports = homebridge => {
         // get the relative humidity of the internal sensor
         getHumidity: function (callback) 
         {
-            this.log.debug("Get Humidity Requested");
+            debug("Get Humidity Requested");
             
             this.fetchData((err, data) => {
                 if (err) {
@@ -143,7 +144,7 @@ module.exports = homebridge => {
 
         getHumidityStatus: function (callback) 
         {
-            this.log.debug("Get Humidity Status Requested");
+            debug("Get Humidity Status Requested");
             
             this.fetchData((err, data) => {
                 if (err) {
@@ -157,7 +158,7 @@ module.exports = homebridge => {
         // get the dewpoint of the internal sensor
         getDewpoint: function (callback) 
         {
-            this.log.debug("Get Dewpoint Requested");
+            debug("Get Dewpoint Requested");
             
             this.fetchData((err, data) => {
                 if (err) {
@@ -172,7 +173,7 @@ module.exports = homebridge => {
         // get the temperature of the internal sensor
         getDewpointStatus: function (callback) 
         {
-            this.log.debug("Get Dewpoint Status Requested");
+            debug("Get Dewpoint Status Requested");
             
             this.fetchData((err, data) => {
                 if (err) {
@@ -192,7 +193,7 @@ module.exports = homebridge => {
             if (data) 
             {
                 // data found in the cache
-                this.log.debug('Data found in Cache, data =', JSON.stringify(data))
+                debug('Data found in Cache, data =', JSON.stringify(data))
                 callback(data.error, data);
             } 
             else 
@@ -214,7 +215,7 @@ module.exports = homebridge => {
         // use SNMP to get data from the WD15
         getDataFromWD15: function (callback, silent) 
         {
-            this.log.debug('Fetching data via SNMP and updating Cache...')
+            debug('Fetching data via SNMP and updating Cache...')
          
             var that = this;
             
@@ -288,7 +289,7 @@ module.exports = homebridge => {
                     if(!that.cache.set(DATA, result)) {
                         that.log.warn('ERROR - unknown error updating internal cache')
                     } else {
-                        that.log.debug('WD15', JSON.stringify(result));
+                        debug('WD15', JSON.stringify(result));
                         this.lastUpdate = now
                     }
 
@@ -404,7 +405,7 @@ module.exports = homebridge => {
 
             let that = this;
             this.cache.on('expired', (key, value) => {
-                that.log.debug("Cache " + key + " expired");
+                debug("Cache " + key + " expired");
 
                 that.cache.set(OLD_DATA, value, 0);
 
