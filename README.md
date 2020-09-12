@@ -6,10 +6,10 @@
 
 First of all you need to have [Homebridge](https://github.com/nfarina/homebridge) installed. Refer to the repo for 
 instructions.  
-Then run the following command to install `homebridge-http-temperature-sensor`
+Then run the following command to install `homebridge-watchdog15`
 
 ```
-sudo npm install -g homebridge-http-temperature-sensor
+sudo npm install -g homebridge-watchdog15
 ```
 
 ## Configuration
