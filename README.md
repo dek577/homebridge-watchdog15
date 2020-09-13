@@ -46,14 +46,6 @@ The configuration can contain the following properties:
    the Watchdog15. Default is **60** seconds. Homekit calls to get data between these updates will return a cached value from the
    last update.
 
-- `pullInterval` \<integer\> **optional**: The property expects an interval in **milliseconds** in which the plugin 
-    pulls updates from your http device. For more information read [pulling updates](#the-pull-way).
-
-* `mqtt` \<[mqttObject](#mqttobject)\> **optional**: Defines all properties used for mqtt connection ([More on MQTT](#using-mqtt)).  
-    For configuration see [mqttObject](#mqttobject).
-
-- `debug` \<boolean\> **optional**: Enable debug mode and write more logs.
-
 Example config.json
 ```json
 {

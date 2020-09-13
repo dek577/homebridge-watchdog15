@@ -1,9 +1,9 @@
 
-const debug = require('debug')('watchdog15')
 const snmp = require("snmp-native")
 const nodeCache = require( "node-cache" )
 const moment = require('moment')
 const os = require("os")
+const { SSL_OP_EPHEMERAL_RSA } = require('constants')
 
 const DATA = "data";
 const OLD_DATA = 'old_data';
@@ -36,12 +36,12 @@ module.exports = homebridge => {
     FakeGatoHistoryService = require("fakegato-history")(homebridge)
 
     // Register the accessory
-    homebridge.registerAccessory("homebridge-watchdog15", "Watchdog15", Watchdog15)
+    homebridge.registerAccessory("@dek577/homebridge-watchdog15", "Watchdog15", Watchdog15)
 
 
     function Watchdog15 (_log, _config) 
     {
-        debug("Init Watchdog15 Accessory")
+        _log.debug("Init Watchdog15 Accessory")
 
         this.log = _log;
         this.config = _config;
@@ -54,6 +54,11 @@ module.exports = homebridge => {
             this.ip = _config.ip;
         }
         this.name = _config.name || 'Watchdog 15';
+        this.displayName = _config.name;
+        this.serial = _config.serial || '';
+        this.firmware = _config.firmware || '';
+        this.model = _config.model || '';
+
 
         this.warningHiTemp = parseFloat(_config.warningHiTemp) || undefined;
         this.warningLoTemp = parseFloat(_config.warningLoTemp) || undefined;
@@ -65,7 +70,7 @@ module.exports = homebridge => {
         // TTL refresh defaults to 60 seconds unless otherwise noted
         this.cacheTTL = _config.updateInterval || 60;
 
-        debug("Config:", JSON.stringify(_config));
+        this.log.debug("Config:", JSON.stringify(_config));
 
         // Initialize the SNMP Connection 
         this.log('WD15 configured on', this.ip)
@@ -77,11 +82,10 @@ module.exports = homebridge => {
             checkperiod: 1,
             useClones: false
         });
-        
 
         // set up basic WD15 services for the internal sensor
-        this.accessoryInfo = new Service.AccessoryInformation();
-        this.temperatureService = new Service.TemperatureSensor("Current Temperature");
+        this.informationService = new Service.AccessoryInformation();
+        this.temperatureService = new Service.TemperatureSensor("Temp");
         this.humidityService = new Service.HumiditySensor("Humidity");
         this.dewpointService = new Service.TemperatureSensor("Dew Point", "Dew Point");
         this.historyService = new FakeGatoHistoryService("room", this, {
@@ -91,7 +95,6 @@ module.exports = homebridge => {
             filename: os.hostname().split(".")[0] + "_watchdog15_persist.json",
             disableTimer: false,
         });
-        this.lastUpdate = undefined;
 
         // set up auto refresh
         this.enableAutoRefresh();
@@ -99,88 +102,88 @@ module.exports = homebridge => {
 
     Watchdog15.prototype =
     {
-        // get the temperature of the internal sensor
-        getTemperature: function (callback) 
+        getDeviceInfoName: function (callback) 
         {
-            debug("Get Temperature Requested");
-            
+            this.log.debug('getDeviceInfoName()')
+            callback(null, this.name);
+        },
+
+        setDeviceInfoName: function (value, callback) 
+        {
+            this.log.debug('setDeviceInfoName()')
+            this.name = value;
+            callback(null);
+        },
+
+        getDeviceInfoModel: function (callback) 
+        {
+            this.log.debug('getDeviceInfoModel()')
             this.fetchData((err, data) => {
-                if (err) {
-                    callback(err);
-                } else {
-                    callback(null, data.convertedTemp);
-                }
+                callback(err, data.partnum);
             });
         },
 
+        getFirmwareRevision: function (callback) 
+        {
+            this.log.debug('getFirmwareRevision()')
+            this.fetchData((err, data) => {
+                callback(err, data.prodversion);
+            });
+        },
+
+        getDeviceInfoSerial: function (callback) 
+        {
+            this.log.debug('getDeviceInfoSerial()');
+            this.fetchData((err, data) => {
+                callback(err, data.serial);
+            });
+        },
+
+        getTemperature: function (callback) 
+        {
+            this.log.debug('getTemperature()');
+            this.fetchData((err, data) => {
+                callback(err, data.convertedTemp);
+            });
+        },
 
         getTemperatureStatus: function (callback) 
         {
-            debug("Get Temperature Status Requested");
-            
+            this.log.debug('getTemperatureStatus()');
             this.fetchData((err, data) => {
-                if (err) {
-                    callback(err);
-                } else {                
-                    callback(null, data.faultT);
-                }
+                callback(err, data.faultT);
             });
         },
 
-        // get the relative humidity of the internal sensor
         getHumidity: function (callback) 
         {
-            debug("Get Humidity Requested");
-            
+            this.log.debug('getHumidity()');
             this.fetchData((err, data) => {
-                if (err) {
-                    callback(err);
-                } else {
-                    callback(null, data.humidity)
-                }
+                callback(err, data.humidity)
             });
         },
-
 
         getHumidityStatus: function (callback) 
         {
-            debug("Get Humidity Status Requested");
-            
+            this.log.debug('getHumidityStatus()');
             this.fetchData((err, data) => {
-                if (err) {
-                    callback(err);
-                } else {
-                    callback(null, data.faultH);
-                }
+                callback(err, data.faultH);
             });
         },
 
-        // get the dewpoint of the internal sensor
         getDewpoint: function (callback) 
         {
-            debug("Get Dewpoint Requested");
-            
+            this.log.debug('getDewpoint()');
             this.fetchData((err, data) => {
-                if (err) {
-                    callback(err);
-                } else {
-                    callback(null, data.convertedDewpoint);
-                }
+                callback(err, data.convertedDewpoint);
             });
         },
 
-
-        // get the temperature of the internal sensor
         getDewpointStatus: function (callback) 
         {
-            debug("Get Dewpoint Status Requested");
-            
+            this.log.debug('getDewpointStatus()');
             this.fetchData((err, data) => {
-                if (err) {
-                    callback(err);
-                } else {
-                    callback(null, data.faultD);
-                }
+                callback(err, data.faultD);
             });
         },
 
@@ -193,7 +196,7 @@ module.exports = homebridge => {
             if (data) 
             {
                 // data found in the cache
-                debug('Data found in Cache, data =', JSON.stringify(data))
+                //this.log.debug('Data found in Cache, data =', JSON.stringify(data))
                 callback(data.error, data);
             } 
             else 
@@ -215,13 +218,14 @@ module.exports = homebridge => {
         // use SNMP to get data from the WD15
         getDataFromWD15: function (callback, silent) 
         {
-            debug('Fetching data via SNMP and updating Cache...')
+            this.log.debug('Fetching data via SNMP and updating Cache...')
          
             var that = this;
             
             try 
             {
                 let avail, temp, humidity, dewpoint, error, uom;
+                let partnum, deviceID, serial, modelnum, devicecount, prodversion;
                 error = null;
 
                 // walk the parent subtree for all data - this picks up any updates or other changes
@@ -248,6 +252,24 @@ module.exports = homebridge => {
                                 break;
                             case OIDS.TempUnits:
                                 uom = vb.value;
+                                break;
+                            case OIDS.SerialNumber:
+                                serial = vb.value;
+                                break;
+                            case OIDS.PartNumber:
+                                partnum = vb.value;
+                                break;
+                            case OIDS.ModelNumber:
+                                modelnum = vb.value;
+                                break;
+                            case OIDS.deviceID:
+                                deviceID = vb.value;
+                                break;
+                            case OIDS.DeviceCount:
+                                devicecount = vb.value;
+                                break;
+                            case OIDS.ProductVersion:
+                                prodversion = vb.value;
                                 break;
                         }
                     })
@@ -282,6 +304,12 @@ module.exports = homebridge => {
                         faultT,
                         faultH,
                         faultD,
+                        serial,
+                        partnum,
+                        modelnum,
+                        deviceID,
+                        devicecount,
+                        prodversion,
                         error 
                     };
 
@@ -289,8 +317,7 @@ module.exports = homebridge => {
                     if(!that.cache.set(DATA, result)) {
                         that.log.warn('ERROR - unknown error updating internal cache')
                     } else {
-                        debug('WD15', JSON.stringify(result));
-                        this.lastUpdate = now
+                        that.log.debug('data =', JSON.stringify(result));
                     }
 
                     // add another history entry if it has been at least 10 minutes
@@ -327,18 +354,22 @@ module.exports = homebridge => {
         },
 
         getServices: function () 
-        {
-            this.accessoryInfo
+        {            
+            this.informationService
+                .setCharacteristic(Characteristic.Manufacturer, "Vertiv")
+                .setCharacteristic(Characteristic.Model, this.model)
                 .setCharacteristic(Characteristic.Name, this.name)
                 .setCharacteristic(Characteristic.Identify, this.name)
-                .setCharacteristic(Characteristic.Manufacturer, this.manufacturer)
-                .setCharacteristic(Characteristic.Model, this.partNumber)
-                .setCharacteristic(Characteristic.SerialNumber, this.productSerial)
-                .setCharacteristic(Characteristic.FirmwareRevision, this.productVersion);
+                .setCharacteristic(Characteristic.FirmwareRevision, this.firmware)
+                .setCharacteristic(Characteristic.SerialNumber, this.serial)
+
+            this.informationService
+                .getCharacteristic(Characteristic.FirmwareRevision)
+                .on("get", this.getFirmwareRevision.bind(this));
 
             this.temperatureService
                 .getCharacteristic(Characteristic.CurrentTemperature)
-                .setProps({ minValue: -20.0, maxValue: 85.0 })
+                .setProps({ minValue: this.f2c(this.warningLoTemp), maxValue: this.f2c(this.warningHiTemp) })
                 .on("get", this.getTemperature.bind(this));
 
             this.temperatureService
@@ -363,6 +394,9 @@ module.exports = homebridge => {
                 .getCharacteristic(Characteristic.StatusFault)
                 .on("get", this.getDewpointStatus.bind(this))
 
+            this.historyService
+                .setCharacteristic(Characteristic.SerialNumber, os.hostname() + "-" + this.serial)
+
             return [
                 this.informationService,
                 this.temperatureService,
@@ -374,13 +408,17 @@ module.exports = homebridge => {
 
         updateCharacteristics(data) 
         {
+            this.informationService
+                .getCharacteristic(Characteristic.FirmwareRevision)
+                .updateValue(data.prodversion);
+
             this.temperatureService
                 .getCharacteristic(Characteristic.CurrentTemperature)
                 .updateValue(data.convertedTemp);
 
             this.temperatureService
                 .getCharacteristic(Characteristic.StatusFault)
-                .updateValue(data.faultT)
+                .updateValue(data.faultT);
 
             this.humidityService
                 .getCharacteristic(Characteristic.CurrentRelativeHumidity)
@@ -388,7 +426,7 @@ module.exports = homebridge => {
 
             this.humidityService
                 .getCharacteristic(Characteristic.StatusFault)
-                .updateValue(data.faultH)
+                .updateValue(data.faultH);
 
             this.dewpointService
                 .getCharacteristic(Characteristic.CurrentTemperature)
@@ -396,7 +434,7 @@ module.exports = homebridge => {
 
             this.dewpointService
                 .getCharacteristic(Characteristic.StatusFault)
-                .updateValue(data.faultD)
+                .updateValue(data.faultD);
         },
 
         enableAutoRefresh() 
@@ -405,7 +443,7 @@ module.exports = homebridge => {
 
             let that = this;
             this.cache.on('expired', (key, value) => {
-                debug("Cache " + key + " expired");
+                this.log.debug("Cache " + key + " expired");
 
                 that.cache.set(OLD_DATA, value, 0);
 
