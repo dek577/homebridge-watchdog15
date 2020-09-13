@@ -394,7 +394,7 @@ module.exports = homebridge => {
                 .on("get", this.getDewpointStatus.bind(this))
 
             this.historyService
-                .setCharacteristic(Characteristic.SerialNumber, os.hostname() + "-" + this.serial)
+                .setCharacteristic(Characteristic.SerialNumber, this.serial)
 
             return [
                 this.informationService,
