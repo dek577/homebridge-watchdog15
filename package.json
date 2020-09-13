@@ -1,13 +1,13 @@
 {
   "name": "@dek577/homebridge-watchdog15",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A homebridge sensor for the Vertiv Geist Watchdog15.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "publishConfig": {
-   "registry": "https://npm.pkg.github.com/dek577"
+    "registry": "https://npm.pkg.github.com/dek577"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,6 @@
   },
   "homepage": "https://github.com/dek577/homebridge-watchdog15#readme",
   "dependencies": {
-    "debug": "^4.1.1",
     "fakegato-history": "^0.5.6",
     "moment": "^2.27.0",
     "node-cache": "^5.1.2",
