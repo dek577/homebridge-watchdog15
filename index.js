@@ -324,8 +324,7 @@ module.exports = homebridge => {
                     that.historyService.addEntry({
                         time: now.unix(),
                         temp: convertedTemp,
-                        humidity: humidity,
-                        dewpoint: convertedDewpoint
+                        humidity: humidity
                     });
 
                     callback(result.error, result);
