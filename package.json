@@ -23,7 +23,7 @@
     "vertiv",
     "watchdog15"
   ],
-  "author": "Dean K <dek577@users.noreply.github.com>",
+  "author": "dek577 <dek577@users.noreply.github.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dek577/homebridge-watchdog15/issues"
