@@ -49,10 +49,10 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
-      with:
+        with:
           node-version: 10
           registry-url: https://npm.pkg.github.com/
       - run: npm ci
       - run: npm publish
-      env:
+        env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
