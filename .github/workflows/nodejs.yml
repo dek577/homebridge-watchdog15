@@ -1,9 +1,10 @@
-name: NodeJS
+name: Node-CI
 
-on: [push]
+on: [push, pull_request, create]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     strategy:
@@ -12,29 +13,46 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-
-      - name: Cache Node Modules
-        uses: actions/cache@v1
-        id: cache
-        with:
-          path: node_modules
-          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Install NPM
-        if: steps.cache.outputs.cache-hit != 'true'
+      - name: npm install
         run: npm ci
-
-      - name: Build
-        run: npm build
         env:
           CI: true
-
-      - name: Test
+      - name: npm build
+        run: npm run build --if-present
+        env:
+          CI: true
+      - name: npm test
         run: npm test
         env:
           CI: true
+
+  publish-npm:
+    if: github.repository == 'dek577/homebridge-watchdog15' && github.event_name == 'create' && startsWith(github.ref, 'refs/tags/v')
+
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 10
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+      with:
+          node-version: 10
+          registry-url: https://npm.pkg.github.com/
+      - run: npm ci
+      - run: npm publish
+      env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
