@@ -102,40 +102,12 @@ module.exports = homebridge => {
 
     Watchdog15.prototype =
     {
-        getDeviceInfoName: function (callback) 
-        {
-            this.log.debug('getDeviceInfoName()')
-            callback(null, this.name);
-        },
-
-        setDeviceInfoName: function (value, callback) 
-        {
-            this.log.debug('setDeviceInfoName()')
-            this.name = value;
-            callback(null);
-        },
-
-        getDeviceInfoModel: function (callback) 
-        {
-            this.log.debug('getDeviceInfoModel()')
-            this.fetchData((err, data) => {
-                callback(err, data.partnum);
-            });
-        },
-
+ 
         getFirmwareRevision: function (callback) 
         {
             this.log.debug('getFirmwareRevision()')
             this.fetchData((err, data) => {
                 callback(err, data.prodversion);
-            });
-        },
-
-        getDeviceInfoSerial: function (callback) 
-        {
-            this.log.debug('getDeviceInfoSerial()');
-            this.fetchData((err, data) => {
-                callback(err, data.serial);
             });
         },
 
@@ -392,9 +364,6 @@ module.exports = homebridge => {
             this.dewpointService
                 .getCharacteristic(Characteristic.StatusFault)
                 .on("get", this.getDewpointStatus.bind(this))
-
-            this.historyService
-                .setCharacteristic(Characteristic.SerialNumber, this.serial)
 
             return [
                 this.informationService,
