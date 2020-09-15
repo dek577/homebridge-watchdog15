@@ -1,6 +1,6 @@
 {
   "name": "homebridge-watchdog15",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "A homebridge sensor for the Vertiv Geist Watchdog15.",
   "license": "MIT",
   "keywords": [
