@@ -1,12 +1,12 @@
 # homebridge-watchdog15
 [Homebridge](https://github.com/nfarina/homebridge) plugin for the [Vertiv Geist Watchdog15](https://www.vertiv.com/en-us/products-catalog/monitoring-control-and-management/monitoring/watchdog-15/) Temperature/Humidity Sensor
 
+<p align="center"><img alt="" src="https://raw.githubusercontent.com/dek577/homebridge-watchdog15/master/images/image01.png?sanitize=true" width="30%"><img alt="" src="https://raw.githubusercontent.com/dek577/homebridge-watchdog15/master/images/image02.png?sanitize=true" width="30%"><img alt="" src="https://raw.githubusercontent.com/dek577/homebridge-watchdog15/master/images/image03.png?sanitize=true" width="30%"></p>
+
 
 ## Installation
 
-First of all you need to have [Homebridge](https://github.com/nfarina/homebridge) installed. Refer to the repo for 
-instructions.  
-Then run the following command to install `homebridge-watchdog15`
+You need to have [Homebridge](https://github.com/nfarina/homebridge) installed first - refer to the repo for instructions. Then run the following command to install homebridge-watchdog15:
 
 ```
 sudo npm install -g homebridge-watchdog15
@@ -78,3 +78,12 @@ Advanced example config.json
 }
 ```
 This accessory will create a Watchdog15 sensor that updates every 5 minutes with high and low alarms on temperature and a high alarm on humidity.
+
+## TODO
+- [ ] Dynamically update device information (such as firmware revision, model number, etc) from the Watchdog SNMP information
+
+
+## Known Bugs
+
+* History support for dewpoint incorrectly display temperature. The plugin uses the [fakegato-history](https://github.com/simont77/fakegato-history) module to support history.  The plugin uses the fakegato "room" accessory type which supports temperature, humidity and air quality. *There is no built-in fakegato API support for dewpoint.* So dewpoint history will incorrectly display the current temperature history. This is a known issue with no workaround unitl fakegato supports generic/arbitrary signals or dewpoint is added to one of the basic accessory types.
+
