@@ -85,5 +85,5 @@ This accessory will create a Watchdog15 sensor that updates every 5 minutes with
 
 ## Known Bugs
 
-* History support for dewpoint incorrectly display temperature. The plugin uses the [fakegato-history](https://github.com/simont77/fakegato-history) module to support history.  The plugin uses the fakegato "room" accessory type which supports temperature, humidity and air quality. *There is no built-in fakegato API support for dewpoint.* So dewpoint history will incorrectly display the current temperature history. This is a known issue with no workaround unitl fakegato supports generic/arbitrary signals or dewpoint is added to one of the basic accessory types.
+* History support for dewpoint incorrectly displays temperature. The plugin uses the [fakegato-history](https://github.com/simont77/fakegato-history) module to support history.  The plugin uses the fakegato "room" accessory type which supports temperature, humidity and air quality. *There is no built-in fakegato API support for dewpoint.* So dewpoint history will incorrectly display the current temperature history. This is a known issue with no workaround unitl fakegato supports generic/arbitrary signals or dewpoint is added to one of the basic accessory types.
 
